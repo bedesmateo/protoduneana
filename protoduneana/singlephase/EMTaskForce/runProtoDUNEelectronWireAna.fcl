@@ -1,4 +1,7 @@
+#include "ProtoDUNEelectronWireAna.fcl"
 #include "services_dune.fcl"
+#include "ProtoDUNEDataUtils.fcl"
+#include "ProtoDUNEBeamlineUtils.fcl"
 #include "protodune_tools_dune.fcl"
 
 process_name: pdWireAnaTree
@@ -34,7 +37,23 @@ physics:
  {
    pdWireAnaTree:
    {
-     module_type: "ProtoDUNEelectronWireAna"
+   module_type:   @local::proto_WireAna
+   module_type:             "ProtoDUNEelectronWireAna"
+   BeamModuleLabel:         "beamevent" #"generator"
+   CalorimetryTag:          "pandoracalo"
+   ParticleIDTag:	    "pandorapid"
+   TrackerTag:              "pandoraTrack"
+   ShowerTag:               "pandoraShower"
+   HitTag:	            "hitpdune"
+   RawDigitTag:             "tpcrawdecoder:daq"
+   ShowerCalorimetryTag:    "pandoraShowercalo"
+   PFParticleTag:           "pandora"
+   GeneratorTag:            "generator"
+   WireTag:                 "" #"digitwire" for data, "caldata" for MC // Ewerton (added from runProtoDUNEelectronWireAna.fcl)
+   SimChannelTag:           "largeant"
+   Verbose:                 2
+   DataUtils:     @local::standard_protodunedatautils
+   BeamLineUtils: @local::standard_protodunebeamlineutils
    }
  }
  ana:  [ pdWireAnaTree ]
@@ -43,7 +62,18 @@ physics:
 
 }
 
-outputs: {}
-physics.analyzers.pdWireAnaTree.ShowerTag: "pandoraShower"
-physics.analyzers.pdWireAnaTree.PFParticleTag: "pandora"
+outputs:
+{
+out1:
+  {
+    module_type: RootOutput
+    fileName:    "%ifb_output2.root"
+    dataTier:    "output2"
+    compressionLevel: 1 #zlib argument (0-9)
+    fastCloning: true
+    outputCommands : [     ]
+  }
+}
+
 physics.analyzers.pdWireAnaTree.WireTag: "digitwire"
+physics.analyzers.pdWireAnaTree.CalorimetryAlg: @local::pdune_sp_calorimetryalgdata
